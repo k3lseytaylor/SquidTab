@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Test</title>
+        <script language='javascript' src='main.js'></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
+    <form class="form-1">
+      <p>Set Timer <br> on <br> new page</p>
+      <input type="text" name="page" placeholder="Website Url" required>
+      <input type="number" min="0" name="time" placeholder="Set Time Minutes" required>
+      <input type="submit" value="Start">
+      <button id='closeBtn' type="button">Cancel Timer</button>
+    </form>
+    <hr>
+    <p>OR</p>
+    <hr>
+    <form id='form-2'>
+	    <p>  on current page</p>
+	    <input type="number" min="0" id='time-2' placeholder="Set Time Minutes" required>
+	    <button type="button" id='setcrrnt'>Set</button>
+    </form>
+    </body>
+</html>
