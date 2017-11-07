@@ -1,18 +1,17 @@
 <!doctype html>
-
 <html>
     <head>
-        <title>Squid Tabs</title>
+        <title>Squid Tab</title>
         <script language='javascript' src='main.js'></script>
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+      <img src="icon.png">
     <form class="form-1">
       <p>Set Timer <br> on <br> new page</p>
       <input type="text" name="page" placeholder="Website Url" required>
       <input type="number" min="0" name="time" placeholder="Set Time Minutes" required>
       <input type="submit" value="Start">
-      <button id='cancelBtn' type="button">Cancel Timer</button>
     </form>
     <hr>
     <p>OR</p>
@@ -20,7 +19,15 @@
     <form id='form-2'>
 	    <p>  on current page</p>
 	    <input type="number" min="0" id='time-2' placeholder="Set Time Minutes" required>
-	    <button type="button" id='setcrrnt'>Set</button>
+	    <button id='setcrrnt' type="button" >Set</button>
     </form>
+      <div>
+          <h3>Alert</h3>
+          <span class="checkbox">
+          <input type="checkbox">
+          <label data-on="ON" data-off="OFF"></label>
+      </span>
+      </div>
+      <a href="www.google.com">Report Bugs Here</a>
     </body>
 </html>

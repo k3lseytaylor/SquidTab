@@ -1,27 +1,34 @@
 
 initStorage();
 
+let alarmStatus = false;
+
+
 chrome.storage.onChanged.addListener(function(changes, namespace) {
-	console.log(changes.value);
-	
-	if( !changes.value.newValue || changes.value.newValue.address === null  ){
-		console.log('nuuuull');
+	console.log(namespace);
+
+	if(namespace === 'sync'){
+		alarmStatus = changes.alarmStatus.newValue;
 		return;
 	}
 
-   	chrome.storage.sync.get(["value"], function(items){
- 	if(items.value.address === 'getCurrent'){
- 		console.log('current called');
- 		const time = items.value.time;
- 		runCurrent(time);
+	if(namespace === 'local' && changes.value.newValue){
+		
+		if(changes.value.newValue.address === 'getCurrent'){
+ 		
+ 		const time = changes.value.newValue.time;
+ 		runCurrent(time,alarmStatus);
  		return;
- 	}
-     const url = items.value.address;
-     const time = items.value.time
-     createTab(url,time);
- 	});
+ 		}
+ 		if(changes.value.newValue.address === null){
+ 			
+ 		return;
+ 		}
+ 		const url = changes.value.newValue.address;
+     	const time = changes.value.newValue.time
+     	createTab(url,time,alarmStatus);
+	}
 });
-
 
 
 function initStorage(){
@@ -30,63 +37,80 @@ function initStorage(){
 		address:null,
 		time:null
 	}
-	chrome.storage.sync.set({'value': box}, function() { 
-            console.log('Settings saved');
-  }); 
+	chrome.storage.local.set({'value': box});
+	chrome.storage.sync.get(['alarmStatus'],function(a){
+		alarmStatus = a.alarmStatus;
+	})
 }
 
 
-function createTab(url,time){
+function createTab(url,time,alarmStatus){
 	const site  = JSON.parse(url);
 	 chrome.tabs.create({'url': 'https://' + site ,"selected":true}, function(tab){
-        console.log('done');
         const id = tab.id;
-        console.log(id);
-        timer(time,id);
+        timer(time,id,alarmStatus);
     });
 }
 
-function runCurrent(time){
+function runCurrent(time,alarmStatus){
 	chrome.tabs.query({active:true,windowType:"normal", currentWindow: true},
     function(tab){
        const id = tab[0].id;
-        console.log(id);
-        timer(time,id);
+        timer(time,id,alarmStatus);
     })
 }
 
-function timer(time,tabID){
-
-	const minutetime = time * 1000
-	console.log(minutetime);
-	alert('Press Okay to start timer');
+function timer(time,tabID,alarmStatus){
+	const minutetime = (time * 1000)*60;
+	let intervaltime = time;
+	// listen(tabID);
+	alertToggle(alarmStatus,'Press Ok to start timer');
+	chrome.tabs.executeScript(tabID,{code:`document.title =  ' [ ${intervaltime} ]min'`});
+	const counter = setInterval(function(){
+		--intervaltime;
+		chrome.tabs.executeScript(tabID,{code:`document.title =  ' [ ${intervaltime} ]min'`});
+	}, 60000);
 
     setTimeout(function(minutetime){ 
-    	removeTabs(tabID);
-    	
-	}, minutetime);
-	
+    	removeTabs(alarmStatus,tabID);
+    	clearInterval(counter);	
+	}, minutetime);	
 }
 
 
-function removeTabs(tabID){
+function removeTabs(alarmStatus,tabID){
 	chrome.tabs.query(  {}, function(tabs) {
      for(let i = 0; i<tabs.length; i++){
        if (tabs[i].id === tabID) {
          console.log(`Tab ${tabID} exists!`);
          chrome.tabs.remove(tabID, function(){
-			chrome.storage.sync.clear(function(){
-               console.log('cleared') 
-            });
+         	 chrome.storage.local.remove(['value']);
 		}); 
          return;
        }
      }
-     	alert("Timer ran out Tab was closed manualy");
+    alertToggle(alarmStatus,"Timer ran out Tab was closed manualy");
   	 });
 }
 
-function updateInfo(){
-	chrome.tabs.executeScript(tabID,{code:`document.title='SquidTabs ${time}min'`});
-}
+function alertToggle(alarmStatus,text){
+	if(!alarmStatus){
+		return;
+	}
+	alert(text);
+};
 
+
+// function listen(tabID){
+// 	chrome.tabs.onUpdated.addListener(function(tabID,changeInfo,tab){
+// 		console.log(changeInfo);
+// 		if(changeInfo.title === changeInfo.title){
+// 			console.log('Changed', changeInfo.title);
+// 		}
+// 	});
+// }
+
+
+
+//My BOX --
+// chrome.tabs.executeScript(tabID,{code:`var a = document.title; document.title = a + ' [${intervaltime}]min'`});

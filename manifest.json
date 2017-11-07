@@ -1,23 +1,23 @@
 {
   "manifest_version": 2,
 
-  "name": "SquidTabs",
+  "name": "SquidTab",
   "description": "",
   "version": "1.0",
 
   "browser_action": {
     "default_icon": "icon.png",
     "default_popup": "index.html"
- },
+  },
   "background": {
     "scripts": ["background.js"]
   },
   "permissions": [
+    "background",
     "activeTab",
     "storage",
     "tabs",
-    "http://*/*", 
-    "https://*/*",
-    "background"
+  "http://*/*", 
+  "https://*/*"
   ]
 }

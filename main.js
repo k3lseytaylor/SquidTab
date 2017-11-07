@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('setcrrnt').addEventListener('click', setonCurrent);
-    document.getElementById('cancelBtn').addEventListener('click', get);
     document.querySelector('.form-1').addEventListener('submit', Ctrler);
-        
+    document.querySelector('.checkbox').addEventListener('click', setSetting);
+    getSetting();        
 });
+
 
 function Ctrler(){
   const address = JSON.stringify((this.querySelector('[name=page]')).value);
@@ -12,18 +13,12 @@ function Ctrler(){
   
 }
 
- function get(){
-   chrome.storage.sync.get(["value"], function(items){
-   });
- }
-
- function setonCurrent(){
-  const time = (document.getElementById('time-2')).value 
+function setonCurrent(){
   const address = 'getCurrent';
+  const time = parseInt((document.getElementById('time-2')).value );
   send(address,time);
   document.getElementById("form-2").reset();
- }
-
+}
 
 function send(address,time){
    const box = {
@@ -31,11 +26,18 @@ function send(address,time){
     address,
     time,
   }
-  chrome.storage.sync.set({'value': box}, function() { 
-   
-  });
+  chrome.storage.local.set({'value': box});
 }
 
 
+function getSetting(){
+  chrome.storage.sync.get(['alarmStatus'],function(obj){
+    document.querySelector('.checkbox > input').checked = obj.alarmStatus;   
+  })
+}
 
-
+function setSetting(){
+    var alarmStatus = document.querySelector('.checkbox > input').checked;
+    chrome.storage.sync.set({'alarmStatus': alarmStatus},function(){
+  })
+}
